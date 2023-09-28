@@ -1,0 +1,36 @@
+[gd_scene load_steps=5 format=3 uid="uid://cvcguk6b3lq4b"]
+
+[ext_resource type="PackedScene" uid="uid://bn32n1rtvi7yv" path="res://tscn/background.tscn" id="1_pbvm6"]
+[ext_resource type="PackedScene" uid="uid://da3cfqit53x2v" path="res://tscn/pterodactylus.tscn" id="2_rpdv7"]
+
+[sub_resource type="GDScript" id="GDScript_61ls1"]
+script/source = "extends Node2D
+
+var scroll_speed = 50
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	$pterodactylus/AnimatedSprite2D.play(\"walk\")
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	$background.scroll_offset.x -= scroll_speed * delta
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4iccr"]
+size = Vector2(256, 3)
+
+[node name="main_scene" type="Node2D"]
+script = SubResource("GDScript_61ls1")
+
+[node name="background" parent="." instance=ExtResource("1_pbvm6")]
+
+[node name="pterodactylus" parent="." instance=ExtResource("2_rpdv7")]
+position = Vector2(20, 20)
+
+[node name="ground_staticbody" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ground_staticbody"]
+position = Vector2(128, 142.5)
+shape = SubResource("RectangleShape2D_4iccr")

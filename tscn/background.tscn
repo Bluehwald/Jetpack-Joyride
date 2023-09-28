@@ -1,0 +1,156 @@
+[gd_scene load_steps=8 format=3 uid="uid://bn32n1rtvi7yv"]
+
+[ext_resource type="Texture2D" uid="uid://dwia6bllqx0sp" path="res://art/background/background.png" id="1_2vm2q"]
+[ext_resource type="Texture2D" uid="uid://dkceff2feclm5" path="res://art/foliage/tall_grass01.png" id="2_1vbyc"]
+[ext_resource type="Texture2D" uid="uid://ia3483ovp68w" path="res://art/ground/dry_ground.png" id="2_sxqvk"]
+[ext_resource type="Texture2D" uid="uid://k4hpcsfh88ky" path="res://art/pterodactylus/walk01.png" id="3_jxjm2"]
+[ext_resource type="Texture2D" uid="uid://ehbrwq4aw4oa" path="res://art/foliage/flower01.png" id="3_pv1wk"]
+[ext_resource type="Texture2D" uid="uid://dwmhpyqtf2r0h" path="res://art/foliage/flower02.png" id="4_74vn2"]
+[ext_resource type="Texture2D" uid="uid://camvy7gm6n81m" path="res://art/foliage/low_grass01.png" id="5_4pi5b"]
+
+[node name="background" type="ParallaxBackground"]
+
+[node name="most_back" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.1, 0.1)
+motion_mirroring = Vector2(256, 0)
+
+[node name="background" type="Sprite2D" parent="most_back"]
+texture_filter = 1
+position = Vector2(128, 72)
+texture = ExtResource("1_2vm2q")
+
+[node name="foliage_05" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.5, 0.5)
+motion_mirroring = Vector2(256, 0)
+
+[node name="tall_grass_01" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(117, 123)
+texture = ExtResource("2_1vbyc")
+
+[node name="tall_grass_02" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(150, 120)
+texture = ExtResource("2_1vbyc")
+
+[node name="tall_grass_03" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(222, 123)
+texture = ExtResource("2_1vbyc")
+
+[node name="tall_grass_04" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(26, 123)
+texture = ExtResource("2_1vbyc")
+
+[node name="flower_a_01" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(44, 122)
+texture = ExtResource("3_pv1wk")
+
+[node name="flower_a_02" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(80, 120)
+scale = Vector2(-1, 1)
+texture = ExtResource("3_pv1wk")
+
+[node name="flower_a_03" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(240, 123)
+scale = Vector2(-1, 1)
+texture = ExtResource("3_pv1wk")
+
+[node name="flower_a_04" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(184, 121)
+texture = ExtResource("3_pv1wk")
+
+[node name="flower_b_01" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(66, 120)
+texture = ExtResource("4_74vn2")
+
+[node name="flower_b_02" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(187, 120)
+scale = Vector2(-1, 1)
+texture = ExtResource("4_74vn2")
+
+[node name="flower_b_03" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(54, 124)
+scale = Vector2(-1, 1)
+texture = ExtResource("4_74vn2")
+
+[node name="flower_b_04" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(190, 123)
+texture = ExtResource("4_74vn2")
+
+[node name="flower_b_05" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(54, 124)
+rotation = 3.14159
+scale = Vector2(1, -1)
+texture = ExtResource("4_74vn2")
+
+[node name="low_grass_01" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(16, 123)
+texture = ExtResource("5_4pi5b")
+
+[node name="low_grass_02" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(51, 122)
+texture = ExtResource("5_4pi5b")
+
+[node name="low_grass_03" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(90, 124)
+texture = ExtResource("5_4pi5b")
+
+[node name="low_grass_04" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(61, 122)
+texture = ExtResource("5_4pi5b")
+
+[node name="low_grass_05" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(150, 124)
+texture = ExtResource("5_4pi5b")
+
+[node name="low_grass_06" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(181, 124)
+texture = ExtResource("5_4pi5b")
+
+[node name="low_grass_07" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(211, 125)
+texture = ExtResource("5_4pi5b")
+
+[node name="low_grass_08" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(221, 124)
+texture = ExtResource("5_4pi5b")
+
+[node name="low_grass_09" type="Sprite2D" parent="foliage_05"]
+texture_filter = 1
+position = Vector2(241, 124)
+texture = ExtResource("5_4pi5b")
+
+[node name="ground" type="ParallaxLayer" parent="."]
+texture_repeat = 2
+motion_mirroring = Vector2(256, 0)
+
+[node name="dry_ground" type="Sprite2D" parent="ground"]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(128, 140)
+texture = ExtResource("2_sxqvk")
+
+[node name="test_player" type="Sprite2D" parent="."]
+visible = false
+texture_filter = 1
+position = Vector2(20, 130)
+texture = ExtResource("3_jxjm2")
