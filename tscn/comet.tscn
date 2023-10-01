@@ -1,0 +1,47 @@
+[gd_scene load_steps=4 format=3 uid="uid://b3ptdkgcbbb4g"]
+
+[ext_resource type="Texture2D" uid="uid://1bjtk8ltlt8e" path="res://art/dangers/comet.png" id="1_o0m2p"]
+
+[sub_resource type="GDScript" id="GDScript_cm158"]
+script/source = "extends Area2D
+
+signal comet_hit_player
+
+const COMET_SPEED = 20
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _physics_process(delta):
+	position += Vector2(- COMET_SPEED * delta, COMET_SPEED * delta)
+	if position.x < -256:
+		position.x = 256
+
+
+func _on_body_entered(body):
+	print(\"Comet hit body with name: \" + body.name)
+	if body.name == \"pterodactylus\":
+		comet_hit_player.emit()
+"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8k53k"]
+radius = 15.6042
+height = 50.5443
+
+[node name="comet" type="Area2D"]
+script = SubResource("GDScript_cm158")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(36, 36)
+texture = ExtResource("1_o0m2p")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(26, 46)
+rotation = 0.568737
+shape = SubResource("CapsuleShape2D_8k53k")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

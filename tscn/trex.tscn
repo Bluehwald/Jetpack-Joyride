@@ -1,0 +1,58 @@
+[gd_scene load_steps=6 format=3 uid="uid://6ta5ynkynkgw"]
+
+[ext_resource type="Texture2D" uid="uid://bh7btk1onoo7d" path="res://art/dangers/trex_01.png" id="1_aghnc"]
+[ext_resource type="Texture2D" uid="uid://btn1rjbp2kr42" path="res://art/dangers/trex_02.png" id="2_i0vot"]
+
+[sub_resource type="GDScript" id="GDScript_wyn6b"]
+script/source = "extends Area2D
+
+signal t_rex_chomped_player
+
+const TREX_SPEED = 20
+
+func _ready():
+	$AnimatedSprite2D.play(\"chomp\")
+
+func _physics_process(delta):
+	position.x -= TREX_SPEED * delta
+	if position.x < -256:
+		position.x = 256
+
+func _on_body_entered(body):
+	print(\"T-Rex chomped body with name: \" + body.name)
+	if body.name == \"pterodactylus\":
+		t_rex_chomped_player.emit()
+"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_dh34i"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_aghnc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_i0vot")
+}],
+"loop": true,
+"name": &"chomp",
+"speed": 3.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lrcrb"]
+size = Vector2(56, 49)
+
+[node name="trex" type="Area2D"]
+script = SubResource("GDScript_wyn6b")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(222, 108)
+sprite_frames = SubResource("SpriteFrames_dh34i")
+animation = &"chomp"
+frame_progress = 0.399715
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(214, 119.5)
+shape = SubResource("RectangleShape2D_lrcrb")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

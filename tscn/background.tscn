@@ -1,14 +1,49 @@
-[gd_scene load_steps=8 format=3 uid="uid://bn32n1rtvi7yv"]
+[gd_scene load_steps=17 format=3 uid="uid://bn32n1rtvi7yv"]
 
 [ext_resource type="Texture2D" uid="uid://dwia6bllqx0sp" path="res://art/background/background.png" id="1_2vm2q"]
 [ext_resource type="Texture2D" uid="uid://dkceff2feclm5" path="res://art/foliage/tall_grass01.png" id="2_1vbyc"]
+[ext_resource type="Texture2D" uid="uid://c4oh3hjr6s230" path="res://art/foliage/skyline.png" id="2_mrigj"]
 [ext_resource type="Texture2D" uid="uid://ia3483ovp68w" path="res://art/ground/dry_ground.png" id="2_sxqvk"]
+[ext_resource type="Texture2D" uid="uid://eaap0km26bwg" path="res://art/foliage/cloud02.png" id="3_301u4"]
 [ext_resource type="Texture2D" uid="uid://k4hpcsfh88ky" path="res://art/pterodactylus/walk01.png" id="3_jxjm2"]
 [ext_resource type="Texture2D" uid="uid://ehbrwq4aw4oa" path="res://art/foliage/flower01.png" id="3_pv1wk"]
+[ext_resource type="Texture2D" uid="uid://cmw0e7llcg438" path="res://art/foliage/mountains.png" id="3_qj1uo"]
 [ext_resource type="Texture2D" uid="uid://dwmhpyqtf2r0h" path="res://art/foliage/flower02.png" id="4_74vn2"]
+[ext_resource type="Texture2D" uid="uid://d2dhrblsxtafb" path="res://art/foliage/cloud01.png" id="4_qd0gd"]
 [ext_resource type="Texture2D" uid="uid://camvy7gm6n81m" path="res://art/foliage/low_grass01.png" id="5_4pi5b"]
+[ext_resource type="Texture2D" uid="uid://bx7a11ddndj03" path="res://art/foliage/cloud03.png" id="5_42slc"]
+[ext_resource type="Texture2D" uid="uid://cs2fa8iysiubx" path="res://art/foliage/cloud04.png" id="6_c3mxb"]
+[ext_resource type="Texture2D" uid="uid://bwphnxxg1ybtx" path="res://art/foliage/trees.png" id="8_51q5m"]
+
+[sub_resource type="GDScript" id="GDScript_xbpco"]
+script/source = "extends ParallaxBackground
+
+signal trigger_foliage_randomization
+
+#var counter_hit_foliage_randomization = 0
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+
+func _on_collision_beginning_body_entered(body):
+#	counter_hit_foliage_randomization += 1
+#	print(counter_hit_foliage_randomization)
+#	if (counter_hit_foliage_randomization % 2) == 0:
+	trigger_foliage_randomization.emit()
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5pghs"]
+size = Vector2(10, 144)
 
 [node name="background" type="ParallaxBackground"]
+script = SubResource("GDScript_xbpco")
 
 [node name="most_back" type="ParallaxLayer" parent="."]
 motion_scale = Vector2(0.1, 0.1)
@@ -18,6 +53,69 @@ motion_mirroring = Vector2(256, 0)
 texture_filter = 1
 position = Vector2(128, 72)
 texture = ExtResource("1_2vm2q")
+
+[node name="foliage_015" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.15, 0.15)
+motion_mirroring = Vector2(256, 0)
+
+[node name="skyline" type="Sprite2D" parent="foliage_015"]
+texture_filter = 1
+position = Vector2(128, 72)
+texture = ExtResource("2_mrigj")
+
+[node name="foliage_016" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.16, 0.16)
+motion_mirroring = Vector2(180, 0)
+
+[node name="cloud02" type="Sprite2D" parent="foliage_016"]
+texture_filter = 1
+position = Vector2(128, 72)
+texture = ExtResource("3_301u4")
+
+[node name="foliage_017" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.17, 0.17)
+motion_mirroring = Vector2(300, 0)
+
+[node name="cloud01" type="Sprite2D" parent="foliage_017"]
+texture_filter = 1
+position = Vector2(128, 72)
+texture = ExtResource("4_qd0gd")
+
+[node name="foliage_018" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.18, 0.18)
+motion_mirroring = Vector2(188, 0)
+
+[node name="cloud03" type="Sprite2D" parent="foliage_018"]
+texture_filter = 1
+position = Vector2(128, 72)
+texture = ExtResource("5_42slc")
+
+[node name="foliage_019" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.19, 0.19)
+motion_mirroring = Vector2(279, 0)
+
+[node name="cloud04" type="Sprite2D" parent="foliage_019"]
+texture_filter = 1
+position = Vector2(128, 72)
+texture = ExtResource("6_c3mxb")
+
+[node name="foliage_02" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.2, 0.2)
+motion_mirroring = Vector2(256, 0)
+
+[node name="mountains" type="Sprite2D" parent="foliage_02"]
+texture_filter = 1
+position = Vector2(128, 72)
+texture = ExtResource("3_qj1uo")
+
+[node name="foliage_03" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.3, 0.3)
+motion_mirroring = Vector2(256, 0)
+
+[node name="trees" type="Sprite2D" parent="foliage_03"]
+texture_filter = 1
+position = Vector2(128, 72)
+texture = ExtResource("8_51q5m")
 
 [node name="foliage_05" type="ParallaxLayer" parent="."]
 motion_scale = Vector2(0.5, 0.5)
@@ -139,6 +237,12 @@ texture_filter = 1
 position = Vector2(241, 124)
 texture = ExtResource("5_4pi5b")
 
+[node name="collision_beginning" type="Area2D" parent="foliage_05"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="foliage_05/collision_beginning"]
+position = Vector2(5, 72)
+shape = SubResource("RectangleShape2D_5pghs")
+
 [node name="ground" type="ParallaxLayer" parent="."]
 texture_repeat = 2
 motion_mirroring = Vector2(256, 0)
@@ -154,3 +258,5 @@ visible = false
 texture_filter = 1
 position = Vector2(20, 130)
 texture = ExtResource("3_jxjm2")
+
+[connection signal="body_entered" from="foliage_05/collision_beginning" to="." method="_on_collision_beginning_body_entered"]

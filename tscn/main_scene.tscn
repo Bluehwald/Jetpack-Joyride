@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cvcguk6b3lq4b"]
+[gd_scene load_steps=7 format=3 uid="uid://cvcguk6b3lq4b"]
 
 [ext_resource type="PackedScene" uid="uid://bn32n1rtvi7yv" path="res://tscn/background.tscn" id="1_pbvm6"]
 [ext_resource type="PackedScene" uid="uid://da3cfqit53x2v" path="res://tscn/pterodactylus.tscn" id="2_rpdv7"]
+[ext_resource type="PackedScene" uid="uid://6ta5ynkynkgw" path="res://tscn/trex.tscn" id="3_juk4m"]
+[ext_resource type="PackedScene" uid="uid://b3ptdkgcbbb4g" path="res://tscn/comet.tscn" id="4_a8n1m"]
 
 [sub_resource type="GDScript" id="GDScript_61ls1"]
 script/source = "extends Node2D
@@ -10,16 +12,29 @@ var scroll_speed = 50
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$pterodactylus/AnimatedSprite2D.play(\"walk\")
+	pass
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	$background.scroll_offset.x -= scroll_speed * delta
+	
+	if (Input.is_action_just_pressed(\"quit\")):
+		get_tree().quit()
+
+
+func _on_background_trigger_foliage_randomization():
+#	$background/foliage_05.motion_mirroring.x = randi_range(256, 512)
+#	$background/foliage_05/flower_b_01.position.x = randi_range(16, 240) # between 16 and 240 because it should be in the screen (sprite is 32px)
+	pass # not working as intended right now, need to rethink - maybe I'll just skip it...
+
+
+func _on_trex_t_rex_chomped_player():
+	print(\"T-Rex chomped player!\")
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4iccr"]
-size = Vector2(256, 3)
+size = Vector2(36, 3)
 
 [node name="main_scene" type="Node2D"]
 script = SubResource("GDScript_61ls1")
@@ -32,5 +47,19 @@ position = Vector2(20, 20)
 [node name="ground_staticbody" type="StaticBody2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ground_staticbody"]
-position = Vector2(128, 142.5)
+position = Vector2(18, 138)
 shape = SubResource("RectangleShape2D_4iccr")
+
+[node name="ceiling_staticbody" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ceiling_staticbody"]
+position = Vector2(18, -1)
+shape = SubResource("RectangleShape2D_4iccr")
+
+[node name="trex" parent="." instance=ExtResource("3_juk4m")]
+
+[node name="comet" parent="." instance=ExtResource("4_a8n1m")]
+position = Vector2(65, -53)
+
+[connection signal="trigger_foliage_randomization" from="background" to="." method="_on_background_trigger_foliage_randomization"]
+[connection signal="t_rex_chomped_player" from="trex" to="." method="_on_trex_t_rex_chomped_player"]

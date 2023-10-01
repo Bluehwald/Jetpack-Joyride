@@ -1,42 +1,115 @@
-[gd_scene load_steps=7 format=3 uid="uid://da3cfqit53x2v"]
+[gd_scene load_steps=15 format=3 uid="uid://da3cfqit53x2v"]
 
+[ext_resource type="Texture2D" uid="uid://ptlylisqnq50" path="res://art/pterodactylus/fly01.png" id="1_jhm3v"]
 [ext_resource type="Texture2D" uid="uid://k4hpcsfh88ky" path="res://art/pterodactylus/walk01.png" id="1_yf14l"]
+[ext_resource type="Texture2D" uid="uid://dk3bwmt43f635" path="res://art/pterodactylus/fly02.png" id="2_dfixn"]
 [ext_resource type="Texture2D" uid="uid://c2776g5mgmpwa" path="res://art/pterodactylus/walk02.png" id="2_eyfwt"]
 [ext_resource type="Texture2D" uid="uid://dyimwydra7yyd" path="res://art/pterodactylus/walk03.png" id="3_u2130"]
+[ext_resource type="Texture2D" uid="uid://fw7815yjn5p4" path="res://art/pterodactylus/fly_particles_01.png" id="6_63hqb"]
 
 [sub_resource type="GDScript" id="GDScript_osjdx"]
 script/source = "extends CharacterBody2D
 
 
-const SPEED = 300.0
-const JUMP_VELOCITY = -400.0
+const MAX_UPWARD_VELOCITY = -200.0
+const MAX_DOWNWARD_VELOCITY = 500
+
+const MAX_ROTATION_DOWNWARDS = deg_to_rad(-34)
+const MAX_ROTATION_UPWARDS = deg_to_rad(34)
+
+var rotation_weight : float
+var original_rotation : float
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting(\"physics/2d/default_gravity\")
 
+var pressed_fly = 0
+
+func _ready():
+	$AnimatedSprite2D.play(\"fly\")
+	original_rotation = transform.get_rotation()
+	$GPUParticles2D.emitting = false
 
 func _physics_process(delta):
-	# Add the gravity.
+	rotation_weight = (velocity.y - MAX_UPWARD_VELOCITY) / (MAX_DOWNWARD_VELOCITY - MAX_UPWARD_VELOCITY)
+	if is_on_floor():
+		$AnimatedSprite2D.play(\"walk\")
+		$AnimatedSprite2D.rotation = original_rotation # important: Just rotate the sprite otherwise it messes with the collision 
+	else:
+		
+		$AnimatedSprite2D.rotation = original_rotation + lerp(MAX_ROTATION_DOWNWARDS, MAX_ROTATION_UPWARDS, rotation_weight)
+
+	if Input.is_action_just_pressed(\"fly\"):
+		pressed_fly += 1
+		$AnimatedSprite2D.play(\"fly\")
+		velocity.y = MAX_UPWARD_VELOCITY
+		$GPUParticles2D.restart()
+		$GPUParticles2D.emitting = true
+#		print(velocity.y) # -100 => MAX_UPWARD_VELOCITY
+	else:
+		$GPUParticles2D.emitting = false
+	
+# Add the gravity.
 	if not is_on_floor():
 		velocity.y += gravity * delta
-
-	# Handle Jump.
-	if Input.is_action_just_pressed(\"ui_accept\") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
-
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	var direction = Input.get_axis(\"ui_left\", \"ui_right\")
-	if direction:
-		velocity.x = direction * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
+#		print(velocity.y) # ~500 is maximal velocity down
 
 	move_and_slide()
+
+func play_fly_animation():
+	$AnimatedSprite2D.play(\"fly\")
+
+func pause_fly_animation():
+	$AnimatedSprite2D.play(\"fly\")
+	$AnimatedSprite2D.set_frame_and_progress(1, 0.0)
+	$AnimatedSprite2D.pause()
+
+func _on_timer_timeout():
+	if (pressed_fly > 0) and not is_on_floor():
+		play_fly_animation()
+	elif (pressed_fly <= 0) and not is_on_floor():
+		pause_fly_animation()
+	pressed_fly = 0
 "
+
+[sub_resource type="Gradient" id="Gradient_pdwuu"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_xph84"]
+gradient = SubResource("Gradient_pdwuu")
+
+[sub_resource type="Curve" id="Curve_1dde5"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.336842), -2.55171, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_g7ab2"]
+curve = SubResource("Curve_1dde5")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_qj0v8"]
+emission_shape = 2
+emission_sphere_radius = 6.39
+particle_flag_disable_z = true
+gravity = Vector3(0, 98, 0)
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+damping_min = 7.369
+damping_max = 25.049
+scale_curve = SubResource("CurveTexture_g7ab2")
+color_ramp = SubResource("GradientTexture1D_xph84")
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_l2k6w"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_jhm3v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_dfixn")
+}],
+"loop": true,
+"name": &"fly",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("1_yf14l")
@@ -58,12 +131,25 @@ size = Vector2(28, 19)
 [node name="pterodactylus" type="CharacterBody2D"]
 script = SubResource("GDScript_osjdx")
 
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+texture_filter = 1
+position = Vector2(7, 0)
+amount = 3
+process_material = SubResource("ParticleProcessMaterial_qj0v8")
+texture = ExtResource("6_63hqb")
+lifetime = 0.5
+
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_l2k6w")
-animation = &"walk"
-frame_progress = 0.853228
+animation = &"fly"
+frame_progress = 0.827123
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(1, 1.5)
 shape = SubResource("RectangleShape2D_ev77n")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.3
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
