@@ -1,19 +1,36 @@
-[gd_scene load_steps=7 format=3 uid="uid://cvcguk6b3lq4b"]
+[gd_scene load_steps=9 format=3 uid="uid://cvcguk6b3lq4b"]
 
 [ext_resource type="PackedScene" uid="uid://bn32n1rtvi7yv" path="res://tscn/background.tscn" id="1_pbvm6"]
 [ext_resource type="PackedScene" uid="uid://da3cfqit53x2v" path="res://tscn/pterodactylus.tscn" id="2_rpdv7"]
 [ext_resource type="PackedScene" uid="uid://6ta5ynkynkgw" path="res://tscn/trex.tscn" id="3_juk4m"]
 [ext_resource type="PackedScene" uid="uid://b3ptdkgcbbb4g" path="res://tscn/comet.tscn" id="4_a8n1m"]
+[ext_resource type="AudioStream" uid="uid://clnaduq86r20b" path="res://art/BeepBox-Song.wav" id="5_71wg3"]
+[ext_resource type="AudioStream" uid="uid://bb0jm20n87ld7" path="res://art/Game-Over.wav" id="6_k717y"]
 
 [sub_resource type="GDScript" id="GDScript_61ls1"]
 script/source = "extends Node2D
 
 var scroll_speed = 50
 
+var save_game
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
-
+	if OS.get_name() == \"Android\":
+		$middleLabel.text = \"Touch 📱 to start\"
+	
+	$BackgroundMusic.play()
+	$BackgroundMusic.set_volume_db(-10.0)
+	
+	if FileAccess.file_exists(\"user://savegame.save\"):
+		# load file
+		save_game = FileAccess.open(\"user://savegame.save\", FileAccess.READ)
+		$highScoreLabel.text = str(save_game.get_line())
+		# save info as info does not get truncated!
+		save_game = FileAccess.open(\"user://savegame.save\", FileAccess.WRITE)
+		save_game.store_string($highScoreLabel.text)
+	else:
+		save_game = FileAccess.open(\"user://savegame.save\", FileAccess.WRITE)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -22,15 +39,47 @@ func _process(delta):
 	if (Input.is_action_just_pressed(\"quit\")):
 		get_tree().quit()
 
-
 func _on_background_trigger_foliage_randomization():
 #	$background/foliage_05.motion_mirroring.x = randi_range(256, 512)
 #	$background/foliage_05/flower_b_01.position.x = randi_range(16, 240) # between 16 and 240 because it should be in the screen (sprite is 32px)
 	pass # not working as intended right now, need to rethink - maybe I'll just skip it...
 
-
 func _on_trex_t_rex_chomped_player():
-	print(\"T-Rex chomped player!\")
+	game_over(\"You were chomped by the T-Rex!\")
+
+func _on_comet_comet_hit_player():
+	game_over(\"You were hit by a comet!\")
+
+func _on_pterodactylus_start_game_signal():
+	$BackgroundMusic.set_volume_db(-5.0)
+	$trex.start_game()
+	$comet.start_game()
+	$middleLabel.hide()
+	$currentScoreLabel.text = str(0)
+	$scoreTimer.start()
+
+func game_over(message):
+	$scoreTimer.stop()
+	$BackgroundMusic.set_volume_db(-10.0)
+	$GameOver.play()
+	var high_score_message = \"\"
+	if int($currentScoreLabel.text) > int($highScoreLabel.text):
+		high_score_message = \"Congratulations, you have a new high-score!\"
+		$highScoreLabel.text = $currentScoreLabel.text
+		save_game = FileAccess.open(\"user://savegame.save\", FileAccess.WRITE)
+		save_game.store_string($highScoreLabel.text)
+	$middleLabel.text = \"{message} Your score was {score}! {high_score}\".format({\"message\": message, \"score\": $currentScoreLabel.text, \"high_score\": high_score_message})
+	$currentScoreLabel.text = str(0)
+	$middleLabel.show()
+	$trex.stop_game()
+	$comet.stop_game()
+	$pterodactylus.stop_game()
+
+func _on_score_timer_timeout():
+	$currentScoreLabel.text = str(int($currentScoreLabel.text) + 1)
+	if int($currentScoreLabel.text) % 100 == 0:
+		$trex.increase_difficulty()
+		$comet.increase_difficulty()
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4iccr"]
@@ -59,7 +108,59 @@ shape = SubResource("RectangleShape2D_4iccr")
 [node name="trex" parent="." instance=ExtResource("3_juk4m")]
 
 [node name="comet" parent="." instance=ExtResource("4_a8n1m")]
-position = Vector2(65, -53)
+position = Vector2(65, -65)
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_71wg3")
+
+[node name="middleLabel" type="Label" parent="."]
+texture_filter = 1
+offset_right = 256.0
+offset_bottom = 144.0
+theme_override_font_sizes/font_size = 17
+text = "Press <Space> ⌨ / <LMB>🖱 to start"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="staticLabel" type="Label" parent="."]
+texture_filter = 1
+offset_left = 142.0
+offset_top = -1.0
+offset_right = 212.0
+offset_bottom = 33.0
+theme_override_font_sizes/font_size = 10
+text = "High Score:
+Current Score:"
+
+[node name="highScoreLabel" type="Label" parent="."]
+texture_filter = 1
+offset_left = 211.0
+offset_top = -1.0
+offset_right = 256.0
+offset_bottom = 16.0
+theme_override_font_sizes/font_size = 10
+text = "0"
+horizontal_alignment = 2
+
+[node name="currentScoreLabel" type="Label" parent="."]
+texture_filter = 1
+offset_left = 211.0
+offset_top = 16.0
+offset_right = 256.0
+offset_bottom = 33.0
+theme_override_font_sizes/font_size = 10
+text = "10000000"
+horizontal_alignment = 2
+
+[node name="scoreTimer" type="Timer" parent="."]
+wait_time = 0.01
+
+[node name="GameOver" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_k717y")
 
 [connection signal="trigger_foliage_randomization" from="background" to="." method="_on_background_trigger_foliage_randomization"]
+[connection signal="start_game_signal" from="pterodactylus" to="." method="_on_pterodactylus_start_game_signal"]
 [connection signal="t_rex_chomped_player" from="trex" to="." method="_on_trex_t_rex_chomped_player"]
+[connection signal="comet_hit_player" from="comet" to="." method="_on_comet_comet_hit_player"]
+[connection signal="timeout" from="scoreTimer" to="." method="_on_score_timer_timeout"]

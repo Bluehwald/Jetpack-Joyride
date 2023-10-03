@@ -1,25 +1,54 @@
-[gd_scene load_steps=4 format=3 uid="uid://b3ptdkgcbbb4g"]
+[gd_scene load_steps=5 format=3 uid="uid://b3ptdkgcbbb4g"]
 
 [ext_resource type="Texture2D" uid="uid://1bjtk8ltlt8e" path="res://art/dangers/comet.png" id="1_o0m2p"]
+[ext_resource type="AudioStream" uid="uid://kjtcdqmmxsg6" path="res://art/comet.wav" id="2_i6a0i"]
 
 [sub_resource type="GDScript" id="GDScript_cm158"]
 script/source = "extends Area2D
 
 signal comet_hit_player
 
-const COMET_SPEED = 20
+const COMET_SPEED = 30
+
+var game_started = false
+
+var difficulty_multiplier = 1.0
+
+var screen_size
+var frame_size
+
+var on_screen = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	screen_size = get_viewport().get_visible_rect().size
+	frame_size = $Sprite2D.texture.get_size()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
-	position += Vector2(- COMET_SPEED * delta, COMET_SPEED * delta)
-	if position.x < -256:
-		position.x = 256
+	on_screen = (position.x < frame_size.x && position.x > (frame_size.x + screen_size.x) * (-1)) && (position.y < frame_size.y && position.y > (frame_size.y + screen_size.y) * (-1))
+	if game_started:
+		position += Vector2(-1, 1) * COMET_SPEED * delta * difficulty_multiplier
+		if on_screen:
+			if !$AudioStreamPlayer2D.playing:
+				$AudioStreamPlayer2D.play() 
+		if position.y > 256:
+			position.x = randi_range(144, 1024)
+			position.y = (-1) * position.x
+	else:
+		position.x = randi_range(144, 1024)
+		position.y = (-1) * position.x
 
+func start_game():
+	game_started = true
+	difficulty_multiplier = 1.0
+
+func stop_game():
+	game_started = false
+
+func increase_difficulty():
+	difficulty_multiplier += randf_range(0.1, 0.2)
 
 func _on_body_entered(body):
 	print(\"Comet hit body with name: \" + body.name)
@@ -43,5 +72,8 @@ texture = ExtResource("1_o0m2p")
 position = Vector2(26, 46)
 rotation = 0.568737
 shape = SubResource("CapsuleShape2D_8k53k")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_i6a0i")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://da3cfqit53x2v"]
+[gd_scene load_steps=16 format=3 uid="uid://da3cfqit53x2v"]
 
 [ext_resource type="Texture2D" uid="uid://ptlylisqnq50" path="res://art/pterodactylus/fly01.png" id="1_jhm3v"]
 [ext_resource type="Texture2D" uid="uid://k4hpcsfh88ky" path="res://art/pterodactylus/walk01.png" id="1_yf14l"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c2776g5mgmpwa" path="res://art/pterodactylus/walk02.png" id="2_eyfwt"]
 [ext_resource type="Texture2D" uid="uid://dyimwydra7yyd" path="res://art/pterodactylus/walk03.png" id="3_u2130"]
 [ext_resource type="Texture2D" uid="uid://fw7815yjn5p4" path="res://art/pterodactylus/fly_particles_01.png" id="6_63hqb"]
+[ext_resource type="AudioStream" uid="uid://cvk2vuklmaxab" path="res://art/fly.wav" id="7_3fsod"]
 
 [sub_resource type="GDScript" id="GDScript_osjdx"]
 script/source = "extends CharacterBody2D
@@ -25,6 +26,9 @@ var gravity = ProjectSettings.get_setting(\"physics/2d/default_gravity\")
 
 var pressed_fly = 0
 
+var game_started = false
+signal start_game_signal
+
 func _ready():
 	$AnimatedSprite2D.play(\"fly\")
 	original_rotation = transform.get_rotation()
@@ -40,6 +44,10 @@ func _physics_process(delta):
 		$AnimatedSprite2D.rotation = original_rotation + lerp(MAX_ROTATION_DOWNWARDS, MAX_ROTATION_UPWARDS, rotation_weight)
 
 	if Input.is_action_just_pressed(\"fly\"):
+		if !game_started:
+			game_started = true
+			start_game_signal.emit()
+		$AudioStreamPlayer2D.play()
 		pressed_fly += 1
 		$AnimatedSprite2D.play(\"fly\")
 		velocity.y = MAX_UPWARD_VELOCITY
@@ -63,6 +71,9 @@ func pause_fly_animation():
 	$AnimatedSprite2D.play(\"fly\")
 	$AnimatedSprite2D.set_frame_and_progress(1, 0.0)
 	$AnimatedSprite2D.pause()
+
+func stop_game():
+	game_started = false
 
 func _on_timer_timeout():
 	if (pressed_fly > 0) and not is_on_floor():
@@ -151,5 +162,8 @@ shape = SubResource("RectangleShape2D_ev77n")
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 0.3
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_3fsod")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
